@@ -1,0 +1,8 @@
+RiTHM Web Interface
+
+To set up the node environment run "npm install"
+
+To run the application (on MacOS or Linux), run "./bin/www"
+and go to http://localhost:3001/ in your browser.
+
+For more information on node express applications, refer to http://expressjs.com/

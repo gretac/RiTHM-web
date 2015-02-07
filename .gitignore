@@ -1,5 +1,8 @@
-#directories
+# directories
 node_modules/
+# NOTE: files dir is used to store uploaded files
+# so we do want to keep the .git-keepme file in the dir
+files/
 
 # compiled
 *.o
