@@ -1,0 +1,15 @@
+extends layout
+
+block content
+  h1= title
+
+  form#rithmform(action='/rithm', method='post', enctype="multipart/form-data")
+    span.label LTL Expression
+    textarea.item(name='ltltext')
+
+    span.label Upload trace data:
+    input(type='file', name='tracefile')
+
+    input(class=['item', 'btn'], type='submit', value='Process')
+
+
