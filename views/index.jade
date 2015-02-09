@@ -4,12 +4,17 @@ block content
   h1= title
 
   form#rithmform(action='/rithm', method='post', enctype="multipart/form-data")
-    span.label LTL Expression
-    textarea.item(name='ltltext')
 
-    span.label Upload trace data:
-    input(type='file', name='tracefile')
+    div.form-group
+      label(for='ltltext') LTL Expressions
+      textarea.form-control(rows='3')
 
-    input(class=['item', 'btn'], type='submit', value='Process')
+    div.form-group
+      label(for='tracefile') Upload trace data:
+      input(type='file', name='tracefile')
+
+    hr
+
+    button(type='submit', class=['btn', 'btn-default']) Process
 
 
