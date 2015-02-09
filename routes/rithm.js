@@ -12,28 +12,21 @@ var execRithm = function (ltlfile, tracefile, res) {
   console.log(ltlfile);
 
   // call the RiTHM program to process the files
-  // var javaproc = cp.spawn('java', ['--silent'], {
-  //   stdio: [
-  //     0, // use parents stdin for child
-  //     'pipe', // pipe child's stdout to parent
-  //     fs.openSync("files/err.out", "w") // direct child's stderr to a file
-  //   ]
-  // });
-  // javaproc.stdin.write();
-  // javaproc.stdin.end();
-
-  // javaproc.stdout.on('data', function (data) {
-  //   console.log(data);
-
-  //   // render the output data
-  //   // res.render('rithmout', { title: 'RiTHM', output: data });
-  // });
-
-  res.render('rithmout', { title: 'RiTHM', output: 'done' });
-}
+  cp.exec("./RiTHMJars/rithm " + ltlfile + " " + tracefile,
+    function (error, stdout, stderr) {
+    console.log('stdout: ' + stdout);
+    console.log('stderr: ' + stderr);
+    if (error !== null) {
+      console.log('exec error: ' + error);
+    }
+    fs.readFile('files/out.html', function (err, data) {
+      if (err) throw err;
+      res.render('rithmout');
+    });
+  });
+};
 
 router.post('/', function (req, res) {
-
   var fstream;
   req.pipe(req.busboy);
 
