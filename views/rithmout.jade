@@ -1,1 +1,14 @@
-include ../files/out.html
+//- Half the display will contain the graph, lower half will contain the output
+
+extends layout
+
+block head
+  script(type='text/javascript', src="https://www.google.com/jsapi?autoload={'modules': [{'name': 'visualization', 'version': '1', 'packages': ['corechart']}]}")
+  script(src='/javascripts/visuals.js')
+
+block content
+  h1= title
+
+  div#results_chart(data-chartResults=data)
+
+  include ../files/out.html

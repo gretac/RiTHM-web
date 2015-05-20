@@ -24,6 +24,11 @@ var execRithm = function (ltlfile, tracefile, res) {
       res.render('rithmout');
     });
   });
+
+  fs.readFile('files/graphout.csv', {encoding: 'utf8'}, function (err, data) {
+    if (err) throw err;
+    res.render('rithmout', { title: "RiTHM results", data: data });
+  });
 };
 
 router.post('/', function (req, res) {
