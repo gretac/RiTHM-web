@@ -1,1 +1,32 @@
-include ../files/out.html
+//- Half the display will contain the graph, lower half will contain the output
+
+extends layout
+
+block head
+  script(type='text/javascript', src="https://www.google.com/jsapi?autoload={'modules': [{'name': 'visualization', 'version': '1', 'packages': ['corechart']}]}")
+  script(src='/javascripts/visuals.js')
+
+block content
+  h1= title
+  hr
+
+  div#plot_area
+    each property, index in data
+      div
+        h3= property.str
+        button(class=['btn', 'btn-info'], onclick='getHtmlLog('+ index + ')') View Detailed Log
+        div(data-plot=property.plotData)
+      hr
+
+  div#logModal(class=['modal', 'fade'], role='dialog', aria-labeledby='modalLabel')
+    div.modal-dialog(role='document', style="width: 900px;")
+      div.modal-content
+        div.modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') &times;
+          h4#modalLabel.modal-title Detailed Property Evaluation
+
+        div.modal-body
+
+        div.modal-footer
+          button(class=['btn', 'btn-default'], data-dismiss='modal') Close

@@ -1,0 +1,3 @@
+[submodule "maven-repo"]
+	path = maven-repo
+	url = https://github.com/yogirjoshi/maven-repo.git
