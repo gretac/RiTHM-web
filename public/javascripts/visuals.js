@@ -12,7 +12,17 @@ function drawChart() {
     var rowVals = rowStr.split(',');
     if (rowVals.length < 2) return;
     // rowVals[0] = parseFloat(rowVals[0]);
-    rowVals[1] = rowVals[1] === 'T' ? 1 : 0;
+
+    if (rowVals[1] === 'Satisfied') {
+      rowVals[1] = 2;
+    } else if (rowVals[1] === 'Violated') {
+      rowVals[1] = 0;
+    } else if (rowVals[1] === 'Presumably Satisfied') {
+      rowVals[1] = 1;
+    } else {
+      rowVals[1] = -1;
+    }
+
     dataVals.push(rowVals);
   });
   chartData.addRows(dataVals);
@@ -20,7 +30,7 @@ function drawChart() {
   var options = {
     title: 'Truth over time',
     legend: { position: 'none' },
-    vAxis: { ticks: [{v:0, f:'F'}, {v:1, f:'T'}] }
+    vAxis: { ticks: [{v:0, f:'F'}, {v:2, f:'T'}, {v:1, f:'Tp'}] }
   };
 
   var chart = new google.visualization.SteppedAreaChart(document.getElementById('results_chart'));
