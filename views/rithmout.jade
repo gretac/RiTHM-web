@@ -9,6 +9,8 @@ block head
 block content
   h1= title
 
-  div#results_chart(data-chartResults=data)
-
-  include ../files/out.html
+  div#plot_area
+    each property, index in data
+      div
+        h4= property.str
+        div(data-plot=property.plotData)

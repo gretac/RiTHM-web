@@ -18,19 +18,41 @@ var resPlotPath = 'files/plot';
 function propertyInst (propStr, plotData, htmlData) {
   this.str = propStr;
   this.plotData = plotData;
-  this.htmlData = htmlData;
+  // this.htmlData = htmlData;
 };
 var properties = []; // collection of property insts
 
 var isUndefined = function (value) { return typeof value == 'undefined' };
 
+var parcePlotData = function (data) {
+  var plotData = [];
+
+  String(data).split('\n').forEach(function (rowStr) {
+    var rowVals = rowStr.split(',');
+    rowVals.shift();
+    if (rowVals.length < 2) return;
+
+    if (rowVals[1] === 'Satisfied') {
+      rowVals[1] = 2;
+    } else if (rowVals[1] === 'Violated') {
+      rowVals[1] = 0;
+    } else if (rowVals[1] === 'Presumably Satisfied') {
+      rowVals[1] = 1;
+    } else {
+      rowVals[1] = -1;
+    }
+
+    plotData.push(rowVals);
+  });
+  return plotData;
+};
+
 var showResults = function (res) {
   var i = 0, plotFileName = '', htmlFileName = '', property;
 
   // render results page once all data has been read in
-  var done = _.after(properties.length * 2, function() {
+  var done = _.after(properties.length, function() {
     console.log('Done reading data! Rendering page.');
-    console.log(properties);
     res.render('rithmout', { title: "RiTHM results", data: properties });
   });
 
@@ -47,16 +69,16 @@ var showResults = function (res) {
       fs.readFile(plotFileName, function (err, data) {
         if (err) throw err;
         console.log(i);
-        property.plotData = data;
+        property.plotData = parcePlotData(data);
         done();
       });
 
-      fs.readFile(htmlFileName, function (err, data) {
-        console.log(i);
-        if (err) throw err;
-        property.htmlData = data;
-        done();
-      });
+      // fs.readFile(htmlFileName, function (err, data) {
+      //   console.log(i);
+      //   if (err) throw err;
+      //   property.htmlData = data;
+      //   done();
+      // });
     })(property, i);
   }
 }
