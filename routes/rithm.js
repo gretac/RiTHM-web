@@ -32,6 +32,8 @@ var parcePlotData = function (data) {
     rowVals.shift();
     if (rowVals.length < 2) return;
 
+    rowVals[0] = parseFloat(rowVals[0]).toFixed(2);
+
     if (rowVals[1] === 'Satisfied') {
       rowVals[1] = 2;
     } else if (rowVals[1] === 'Violated') {
@@ -48,7 +50,7 @@ var parcePlotData = function (data) {
 };
 
 var showResults = function (res) {
-  var i = 0, plotFileName = '', htmlFileName = '', property;
+  var i = 0, plotFileName = '', property;
 
   // render results page once all data has been read in
   var done = _.after(properties.length, function() {
@@ -60,25 +62,14 @@ var showResults = function (res) {
   for (i; i < properties.length; i++) {
     property = properties[i];
     plotFileName = resPlotPath + i + "1";
-    htmlFileName = htmlLogPath + i + "0";
 
     (function (property, i) {
-      console.log(i);
-      console.log(property);
-
       fs.readFile(plotFileName, function (err, data) {
         if (err) throw err;
-        console.log(i);
         property.plotData = parcePlotData(data);
         done();
       });
 
-      // fs.readFile(htmlFileName, function (err, data) {
-      //   console.log(i);
-      //   if (err) throw err;
-      //   property.htmlData = data;
-      //   done();
-      // });
     })(property, i);
   }
 }
@@ -117,6 +108,7 @@ router.post('/', function (req, res) {
   });
 
   req.busboy.on('field', function (fieldname, props) {
+    properties = []; // reset existing properties
     props = props.trim().split('\r\n');
     var propStr = "", str = "", cnt = 0, i = 0;
 
@@ -155,6 +147,16 @@ router.post('/', function (req, res) {
         });
       }
     }, 300);
+  });
+});
+
+router.get('/htmllog', function (req, res) {
+  var index = req.query.index;
+  var htmlFileName = htmlLogPath + index + "0";
+
+  fs.readFile(htmlFileName, function (err, data) {
+    if (err) throw err;
+    res.send(data);
   });
 });
 
