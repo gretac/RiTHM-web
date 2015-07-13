@@ -136,6 +136,7 @@ router.post('/', function (req, res) {
           "password=uwaterloo\n" +
           "dataFile=" + req.tracefile + '\n' +
           "traceParserClass=CSV\n" +
+          "resetOnViolation=True\n" +
           req.ltl +
           "monitorOutputLog=../" + htmlLogPath + "\n" +
           "plotFileName=../" + resPlotPath + "\n";
