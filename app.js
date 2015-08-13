@@ -7,6 +7,7 @@ var cookieParser = require('cookie-parser');
 var busboy = require('connect-busboy');
 
 var routes = require('./routes/index');
+var config = require('./routes/config');
 var rithm = require('./routes/rithm');
 
 var app = express();
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
+app.use('/config', config);
 app.use('/rithm', rithm);
 
 // catch 404 and forward to error handler

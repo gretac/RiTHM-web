@@ -1,0 +1,14 @@
+div.well
+  form#rithmform(action='/rithm', method='post', enctype="multipart/form-data")
+
+    div.form-group
+      label(for='ltltext') LTL Expressions
+      textarea.form-control(rows='3', name='ltltext')
+
+    div.form-group
+      label(for='tracefile') Upload trace data:
+      input(type='file', name='tracefile')
+
+    hr
+
+    button(type='submit', class=['btn', 'btn-default']) Process

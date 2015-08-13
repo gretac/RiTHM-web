@@ -3,18 +3,18 @@ extends layout
 block content
   h1= title
 
-  form#rithmform(action='/rithm', method='post', enctype="multipart/form-data")
+  ul(class=['nav', 'nav-tabs'])
+    li.active(role='presentation')
+      a(href='#config', aria-controls='config', role='tab', data-toggle='tab') Main
+    li(role='presentation')
+      a(href='#plugin', aria-controls='plugin', role='tab', data-toggle='tab') Plugin
+    li(role='presentation')
+      a(href='#pipe', aria-controls='pipe', role='tab', data-toggle='tab') Pipe
 
-    div.form-group
-      label(for='ltltext') LTL Expressions
-      textarea.form-control(rows='3', name='ltltext')
-
-    div.form-group
-      label(for='tracefile') Upload trace data:
-      input(type='file', name='tracefile')
-
-    hr
-
-    button(type='submit', class=['btn', 'btn-default']) Process
-
-
+  div.tab-content
+    div#config(role='tabpanel', class=['tab-pane', 'active'])
+      include config.jade
+    div#plugin(role='tabpanel', class=['tab-pane'])
+      include plugin.jade
+    div#pipe(role='tabpanel', class=['tab-pane'])
+      include pipe.jade

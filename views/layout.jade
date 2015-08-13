@@ -1,5 +1,5 @@
 doctype html
-html
+html(ng-app="rithmApp")
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
@@ -7,8 +7,10 @@ html
 
     script(src="//code.jquery.com/jquery-1.11.3.min.js")
     script(src="//code.jquery.com/jquery-migrate-1.2.1.min.js")
+    script(src='/javascripts/angular.js')
     script(src='/javascripts/bootstrap.min.js')
     script(src='/javascripts/lodash.js')
+    script(src='/javascripts/rithm.js')
 
     block head
 
