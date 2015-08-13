@@ -1,14 +1,72 @@
-div.well
-  form#rithmform(action='/rithm', method='post', enctype="multipart/form-data")
+div.well(ng-controller='PipeController')
+  form.form-horizontal
 
-    div.form-group
-      label(for='ltltext') LTL Expressions
-      textarea.form-control(rows='3', name='ltltext')
+    div.row
+      div.col-md-8
+        div.form-group
+          label(for='tracefile', class=['col-sm-4', 'control-label']) Execution trace file:
+          div.col-sm-8
+            input(type='file', ng-model='tracefile')
+      div.col-md-4
+          label(for='dataFormat', class=['col-sm-4', 'control-label']) Data Format:
+          div.col-sm-8
+            select.form-control(ng-model='dataFormat', ng-options="item for item in format")
 
-    div.form-group
-      label(for='tracefile') Upload trace data:
-      input(type='file', name='tracefile')
+    div.row
+      div.col-md-8
+        div.form-group
+          div(class=['col-sm-offset-4', 'col-sm-8'])
+            div.checkbox
+              label
+                input(type='checkbox', ng-model='useDefault')
+                Use Default Predicate Evaluator
+
+    div.row
+      div.col-md-8
+        div.form-group
+          label(for='scriptfile', class=['col-sm-4', 'control-label']) Predicate Evaluator Script File:
+          div.col-sm-8
+            input(type='file', ng-model='scriptfile', ng-disabled="useDefault")
+
+        div.form-group
+          label(for='invCtrl', class=['col-sm-4', 'control-label']) Invocation Controller:
+          div.col-sm-8
+            select.form-control(ng-model='invCtrl', ng-options="item for item in invocator")
+
+      div.col-md-4
+        div.form-group
+          label(for='evalType', class=['col-sm-4', 'control-label']) Evaluator Type:
+          div.col-sm-8
+            select.form-control(ng-model='evalType', ng-options="item for item in evaluator", ng-disabled="useDefault")
+
+        div.form-group
+          label(for='numPipes', class=['col-sm-2', 'control-label']) No. of pipes:
+          div.col-sm-8
+            input(type='text', ng-model='numPipes')
+
+    div.row(ng-repeat="n in [1, 2, 3, 4] track by $index")
+      div.col-md-4
+        div.form-group
+          label(for='specs', class=['col-sm-4', 'control-label']) Specifications:
+          div.col-sm-8
+            textarea.form-control(rows='2', ng-model='specs')
+
+      div.col-md-4
+        div.form-group
+          label(for='logicalFormalism', class=['col-sm-4', 'control-label']) Logical Formalisms:
+          div.col-sm-8
+            textarea.form-control(rows='2', ng-model='logicalFormalism')
+
+      div.col-md-4
+        div.form-group
+          label(for='monitorType', class=['col-sm-4', 'control-label']) Monitor Types:
+          div.col-sm-8
+            textarea.form-control(rows='2', ng-model='monitorType')
 
     hr
 
-    button(type='submit', class=['btn', 'btn-default']) Process
+    div.col-sm-offset-4
+      button(type='submit', class=['btn', 'btn-default']) Process
+      button(type='submit', class=['btn', 'btn-default']) View Output
+      button(type='submit', class=['btn', 'btn-default']) Save Configuration
+      button(type='submit', class=['btn', 'btn-default']) Load Configuration
