@@ -8,22 +8,27 @@ var router = express.Router();
 
 // setup rithm file paths
 var rithmPath = 'maven-repo/';
-var tracePath = rithmPath;
-var inputFile = rithmPath + 'rithm_1.properties';
+var uploadPath = 'files/';
+
+var specsFileName = 'specifications';
+var specsFilePath = rithmPath + specsFileName;
+var configFileName = 'rithm_1.properties';
+var configFilePath = rithmPath + configFileName;
 
 var htmlLogPath = 'files/htmlout';
 var resPlotPath = 'files/plot';
 
 // containers for client data
+var configData = {}; // container for user specified config data
+var isSpecsUpdated = false;
+
 function propertyInst (propStr, plotData, htmlData) {
   this.str = propStr;
   this.plotData = plotData;
   // this.htmlData = htmlData;
 };
-var properties = []; // collection of property insts
 
-var isUndefined = function (value) { return typeof value == 'undefined' };
-
+// helper functions
 var parcePlotData = function (data) {
   var plotData = [];
 
@@ -89,62 +94,68 @@ var execRithm = function (res) {
   });
 };
 
+var composeConfig = function (configData) {
+  // prepare configuration file contents
+  var content = "specFile=" + specsFileName + "\n" +
+    "dataFile=" + configData.tracefile + "\n";
+
+  if (!configData.useDefault) {
+    content += "predicateEvaluatorScriptFile=" + configData.scriptfile + "\n" +
+      "predicateEvaluatorType=" + configData.evalType + "\n";
+  }
+
+  content += "specParserClass=" + configData.logicalFormalism + "\n" +
+    "monitorClass=" + configData.monitorType + "\n" +
+    "traceParserClass=" + configData.dataFormat + "\n" +
+    "invocationController=" + configData.invCtrl + "\n";
+
+  return content;
+};
+
+// routes definition
 router.post('/', function (req, res) {
   var fstream;
   req.pipe(req.busboy);
 
-  req.busboy.on('file', function (filedname, file, filename) {
+  req.busboy.on('file', function (fieldname, file, filename) {
     console.log("Uploading: " + filename);
 
-    var fileloc = tracePath + filename;
+    var fileloc = uploadPath + filename;
     fstream = fs.createWriteStream(fileloc);
     file.pipe(fstream);
 
     fstream.on('close', function () {
-      console.log('file uploaded');
-      // NOTE: assuming executable and trace file are in the same directory
-      req.tracefile = filename;
+      console.log('file uploaded ' + fileloc);
+      configData[fieldname] = fileloc;
     });
   });
 
-  req.busboy.on('field', function (fieldname, props) {
-    properties = []; // reset existing properties
-    props = props.trim().split('\r\n');
-    var propStr = "", str = "", cnt = 0, i = 0;
-
-    for (i; i < props.length; i+=2) {
-      cnt = i/2 + 1;
-      str = props[i] + " " + props[i+1];
-      properties.push(new propertyInst(str, null, null));
-
-      // add the configuration string for the property
-      propStr += "specsPipe" + cnt + "=" + props[i] + "#" + props[i+1] + "\n" +
-        "specParsersPipe" + cnt + "=MTL#LTL\n" + "monitorsPipe" + cnt +
-        "=MTL#LTL4\n\n";
-    }
-    propStr = "pipeCount=" + props.length/2 + "\n" + propStr;
-    req.ltl = propStr;
+  req.busboy.on('field', function (fieldname, value) {
+    console.log("Up field: " + fieldname);
+    configData[fieldname] = value;
   });
 
   req.busboy.on('finish', function () {
+    // write specifications to a file
+    if (_.isUndefined(configData.specs)) conole.log("Error: specs were not specified.");
+    fs.writeFile(specsFilePath, configData.specs, function (err) {
+      if (err) console.log(err);
+      isSpecsUpdated = true;
+    });
+
     var _varCheck = setInterval(function() {
-      if (!isUndefined(req.tracefile) || !isUndefined(req.ltlfile)) {
+      console.log("Tracefile: " + _.isUndefined(configData.tracefile));
+      console.log("Scriptfile: " + _.isUndefined(configData.scriptfile));
+      console.log("Specs: " + isSpecsUpdated);
+
+      if (!_.isUndefined(configData.tracefile) && !_.isUndefined(configData.scriptfile && isSpecsUpdated)) {
         clearInterval(_varCheck);
-
-        // prepare input file contents
-        var content = "userName=rithm\n" +
-          "password=uwaterloo\n" +
-          "dataFile=" + req.tracefile + '\n' +
-          "traceParserClass=CSV\n" +
-          "resetOnViolation=True\n" +
-          req.ltl +
-          "monitorOutputLog=../" + htmlLogPath + "\n" +
-          "plotFileName=../" + resPlotPath + "\n";
-
         // write contents to the input file
-        fs.writeFile(inputFile, content, function (err) {
+        fs.writeFile(configFilePath, composeConfig(configData), function (err) {
           if (err) console.log(err);
-          execRithm(res);
+          // res.send({});
+          // execRithm(res);
+          res.download(configFilePath, configFileName);
         });
       }
     }, 300);
