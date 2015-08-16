@@ -1,5 +1,21 @@
 var rithmApp = angular.module('rithmApp', []);
 
+rithmApp.directive('fileModel', ['$parse', function ($parse) {
+  return {
+    restrict: 'A',
+    link: function(scope, element, attrs) {
+      var model = $parse(attrs.fileModel);
+      var modelSetter = model.assign;
+
+      element.bind('change', function(){
+        scope.$apply(function(){
+          modelSetter(scope, element[0].files[0]);
+        });
+      });
+    }
+  };
+}]);
+
 rithmApp.controller('ConfigController', function($scope, $http) {
   $scope.config = {};
 
@@ -23,10 +39,15 @@ rithmApp.controller('ConfigController', function($scope, $http) {
     $scope.config.invocator = data;
   });
 
-  $scope.processConfig = function () {
-    console.log($scope.config);
-    $http.post('/rithm', { data: $scope.config }, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+  $scope.evalConfig = function (option) {
+    var form = new FormData();
+    _.forEach($scope.config, function (value, key) {
+      form.append(key, value);
+    });
+
+    $http.post('/rithm?option=' + option, form, {
+      transformRequest: angular.identity,
+      headers: { 'Content-Type': undefined }
     }).then(function (resp) {
       console.log(resp);
     });

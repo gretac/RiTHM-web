@@ -137,17 +137,13 @@ router.post('/', function (req, res) {
 
   req.busboy.on('finish', function () {
     // write specifications to a file
-    if (_.isUndefined(configData.specs)) conole.log("Error: specs were not specified.");
+    if (_.isUndefined(configData.specs)) console.log("Error: specs were not specified.");
     fs.writeFile(specsFilePath, configData.specs, function (err) {
       if (err) console.log(err);
       isSpecsUpdated = true;
     });
 
     var _varCheck = setInterval(function() {
-      console.log("Tracefile: " + _.isUndefined(configData.tracefile));
-      console.log("Scriptfile: " + _.isUndefined(configData.scriptfile));
-      console.log("Specs: " + isSpecsUpdated);
-
       if (!_.isUndefined(configData.tracefile) && !_.isUndefined(configData.scriptfile && isSpecsUpdated)) {
         clearInterval(_varCheck);
         // write contents to the input file
