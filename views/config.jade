@@ -65,3 +65,17 @@ div.well(ng-controller='ConfigController')
       input(value='View Output', type='submit', class=['btn', 'btn-default'], ng-click="evalConfig('view')")
       input(value='Save Configuration', type='submit', class=['btn', 'btn-default'], ng-click="evalConfig('save')")
       button(class=['btn', 'btn-default'], ng-click="loadConfig()") Load Configuration
+
+  div#config-view(class=['modal', 'fade'])
+    div.modal-dialog
+      div.modal-content
+        div.modal-header
+          button.close(type='button', data-dismiss='modal', aria-label='Close')
+            span(aria-hidden='true') &times;
+          h4.modal-title Configuration File Contents
+
+        div.modal-body
+          p(ng-repeat="item in resultConfig") {{item}}
+
+        div.modal-footer
+          button(type='button', class=['btn', 'btn-default'], data-dismiss='modal') Close

@@ -49,7 +49,20 @@ rithmApp.controller('ConfigController', function($scope, $http) {
       transformRequest: angular.identity,
       headers: { 'Content-Type': undefined }
     }).then(function (resp) {
-      console.log(resp);
+      if (option === 'view') {
+        // display the contents of the config file in a modal
+        var viewContent = [];
+        String(resp.data).split('\n').forEach(function (rowStr) {
+          viewContent.push(rowStr);
+        });
+        $scope.resultConfig = viewContent;
+        $('#config-view').modal('show');
+      } else if (option === 'save') {
+        console.log(resp.data);
+        console.log("supposedly saved");
+      } else if (option === 'process') {
+        console.log("RiTHM computed. Shod output.");
+      }
     });
   };
 });

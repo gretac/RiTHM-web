@@ -81,17 +81,18 @@ var showResults = function (res) {
 
 var execRithm = function (res) {
   console.log('Executing RiTHM');
+  res.send('RiTHM DONE');
 
   // call the RiTHM program to process the files
-  cp.exec("cd " + rithmPath + " && ./rithm.sh",
-    function (error, stdout, stderr) {
-    console.log('stdout: ' + stdout);
-    console.log('stderr: ' + stderr);
-    if (error !== null) {
-      console.log('exec error: ' + error);
-    }
-    showResults(res);
-  });
+  // cp.exec("cd " + rithmPath + " && ./rithm.sh",
+  //   function (error, stdout, stderr) {
+  //   console.log('stdout: ' + stdout);
+  //   console.log('stderr: ' + stderr);
+  //   if (error !== null) {
+  //     console.log('exec error: ' + error);
+  //   }
+  //   showResults(res);
+  // });
 };
 
 var composeConfig = function (configData) {
@@ -114,6 +115,8 @@ var composeConfig = function (configData) {
 
 // routes definition
 router.post('/', function (req, res) {
+  var option = req.query.option;
+
   var fstream;
   req.pipe(req.busboy);
 
@@ -146,13 +149,20 @@ router.post('/', function (req, res) {
     var _varCheck = setInterval(function() {
       if (!_.isUndefined(configData.tracefile) && !_.isUndefined(configData.scriptfile && isSpecsUpdated)) {
         clearInterval(_varCheck);
-        // write contents to the input file
-        fs.writeFile(configFilePath, composeConfig(configData), function (err) {
-          if (err) console.log(err);
-          // res.send({});
-          // execRithm(res);
-          res.download(configFilePath, configFileName);
-        });
+        var configContent = composeConfig(configData);
+
+        if (option === 'view') {
+          return res.send(configContent);
+        } else {
+          // write contents to the input file
+          fs.writeFile(configFilePath, configContent, function (err) {
+            if (err) console.log(err);
+
+            if (option === 'save') return res.download(configFilePath, configFileName);
+            else if (option === 'process') return execRithm(res);
+            else return res.send({ err: 'processing option not recognized.' });
+          });
+        }
       }
     }, 300);
   });
