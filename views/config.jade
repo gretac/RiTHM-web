@@ -64,9 +64,8 @@ div.well(ng-controller='ConfigController')
       input(value='Process', type='submit', class=['btn', 'btn-primary'], ng-click="evalConfig('process')")
       input(value='View Output', type='submit', class=['btn', 'btn-default'], ng-click="evalConfig('view')")
       input(value='Save Configuration', type='submit', class=['btn', 'btn-default'], ng-click="evalConfig('save')")
-
-  button(class=['btn', 'btn-default'], ng-click="loadConfig()") Load Configuration
-  input#load-file-select(type='file', file-model='loadedConfig')
+      button(class=['btn', 'btn-default'], ng-click="loadConfig()") Load Configuration
+      input#load-file-select(type='file', file-model='loadedConfig')
 
   div#config-view(class=['modal', 'fade'])
     div.modal-dialog
