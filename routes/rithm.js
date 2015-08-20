@@ -18,10 +18,6 @@ var configFilePath = rithmPath + configFileName;
 var htmlLogPath = 'files/htmlout';
 var resPlotPath = 'files/plot';
 
-// containers for client data
-var configData = {}; // container for user specified config data
-var isSpecsUpdated = false;
-
 function propertyInst (propStr, plotData, htmlData) {
   this.str = propStr;
   this.plotData = plotData;
@@ -113,10 +109,58 @@ var composeConfig = function (configData) {
   return content;
 };
 
-// routes definition
-router.post('/', function (req, res) {
-  var option = req.query.option;
+var extractConfig = function (configFileData) {
+  var configData = {};
+  var lines = configFileData.split("\n");
+  if (lines[lines.length - 1] === "") lines.pop();
+  if (lines.length < 6 || lines.length > 8) return configData;
 
+  for (i = 0; i < lines.length; i++) {
+    var tuple = lines[i].split('=');
+    var key = tuple[0];
+    var val = tuple[1];
+
+    switch (key) {
+      case 'specFile':
+        // val is the spec file name, need to read in the contents
+        var fileloc = rithmPath + val;
+        if (fs.existsSync(fileloc)) val = String(fs.readFileSync(fileloc));
+        else val = "Specifications file not found.";
+        configData.specs = val;
+        break;
+      case 'dataFile':
+        configData.tracefile = val;
+        break;
+      case 'predicateEvaluatorScriptFile':
+        configData.scriptfile = val;
+        break;
+      case 'predicateEvaluatorType':
+        configData.evalType = val;
+        break;
+      case 'specParserClass':
+        configData.logicalFormalism = val;
+        break;
+      case 'monitorClass':
+        configData.monitorType = val;
+        break;
+      case 'traceParserClass':
+        configData.dataFormat = val;
+        break;
+      case 'invocationController':
+        configData.invCtrl = val;
+        break;
+    }
+  }
+  return configData;
+};
+
+// ROUTES
+router.post('/', function (req, res) {
+  // containers for client data
+  var configData = {}; // container for user specified config data
+  var isSpecsUpdated = false;
+
+  var option = req.query.option;
   var fstream;
   req.pipe(req.busboy);
 
@@ -163,6 +207,43 @@ router.post('/', function (req, res) {
             else return res.send({ err: 'processing option not recognized.' });
           });
         }
+      }
+    }, 300);
+  });
+});
+
+router.post('/loadconfig', function (req, res) {
+  var option = req.query.option;
+
+  var fstream;
+  req.pipe(req.busboy);
+
+  req.busboy.on('file', function (fieldname, file, filename) {
+    console.log("Uploading: " + filename);
+
+    var fileloc = uploadPath + filename;
+    fstream = fs.createWriteStream(fileloc);
+    file.pipe(fstream);
+
+    fstream.on('close', function () {
+      console.log('file uploaded ' + fileloc);
+      req.config = fileloc;
+    });
+  });
+
+  req.busboy.on('finish', function () {
+    var _varCheck = setInterval(function() {
+      if (!_.isUndefined(req.config)) {
+        clearInterval(_varCheck);
+
+        console.log('reading ' + req.config);
+        fs.readFile(req.config, function (err, data) {
+          if (err) {
+            console.log(err);
+            return res.send(500);
+          }
+          res.send(extractConfig(String(data)));
+        });
       }
     }, 300);
   });

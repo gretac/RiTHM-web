@@ -17,6 +17,8 @@ rithmApp.directive('fileModel', ['$parse', function ($parse) {
 }]);
 
 rithmApp.controller('ConfigController', function($scope, $http) {
+  // TODO: fix this to act the Angular way
+  $("#load-file-select").css('opacity','0');
   $scope.config = {};
 
   $http.get('/config/syntax').success(function(data) {
@@ -63,6 +65,26 @@ rithmApp.controller('ConfigController', function($scope, $http) {
       } else if (option === 'process') {
         console.log("RiTHM computed. Shod output.");
       }
+    });
+  };
+
+  $scope.loadConfig = function () {
+    // trigger a click on the file input field for the config
+    $("#load-file-select").trigger('click');
+    // wait for a file to be selected
+    $scope.$watch('loadedConfig', function (newVal) {
+      var form = new FormData();
+      form.append('configfile', newVal);
+
+      $http.post('/rithm/loadconfig', form, {
+        transformRequest: angular.identity,
+        headers: { 'Content-Type': undefined }
+      }).then(function (resp) {
+        var configData = resp.data;
+        _.forEach(configData, function (value, key) {
+          $scope.config[key] = value;
+        });
+      });
     });
   };
 });
